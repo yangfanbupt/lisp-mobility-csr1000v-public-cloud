@@ -1,0 +1,98 @@
+
+crypto isakmp policy 200
+ encr aes 
+ authentication pre-share
+ group 2
+ lifetime 28800
+crypto isakmp key cisco address 0.0.0.0        
+crypto isakmp keepalive 10 10
+!
+!
+crypto ipsec transform-set dmvpn esp-aes esp-sha-hmac 
+ mode tunnel
+!
+crypto ipsec profile csr1
+ set transform-set dmvpn 
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface Loopback0
+ ip address 1.1.1.1 255.255.255.255
+!         
+interface Tunnel0
+ ip address 12.0.0.1 255.255.255.0
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+ tunnel source GigabitEthernet1
+ tunnel mode ipsec ipv4
+ tunnel destination 54.67.23.67
+ tunnel protection ipsec profile csr1
+!
+interface LISP0
+!
+interface GigabitEthernet1
+ ip address 173.37.56.178 255.255.255.224
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet2
+ ip address 10.0.1.119 255.255.255.0
+ negotiation auto
+ lisp mobility subnet1
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet3
+ ip address 20.0.2.119 255.255.255.0
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+router lisp
+ locator-set dc
+  1.1.1.1 priority 1 weight 100
+  exit-locator-set
+ !
+ service ipv4
+  itr map-resolver 1.1.1.1
+  etr map-server 1.1.1.1 key cisco
+  etr
+  proxy-etr
+  proxy-itr 1.1.1.1
+  map-server
+  map-resolver
+  exit-service-ipv4
+ !
+ instance-id 0
+  dynamic-eid subnet1
+   database-mapping 10.0.1.0/24 locator-set dc
+   map-notify-group 239.0.0.1
+   exit-dynamic-eid
+  !
+  service ipv4
+   eid-table default
+   exit-service-ipv4
+  !
+  exit-instance-id
+ !
+ site dc
+  authentication-key cisco
+  eid-record 10.0.1.0/24 accept-more-specifics
+  exit-site
+ !
+ exit-router-lisp
+!
+router ospf 1
+ network 1.1.1.1 0.0.0.0 area 0
+ network 12.0.0.0 0.0.0.255 area 0
+!
+!
+end
