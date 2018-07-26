@@ -32,7 +32,7 @@ interface Tunnel0
  ip tcp adjust-mss 1360
  tunnel source GigabitEthernet1
  tunnel mode ipsec ipv4
- tunnel destination 54.67.23.67
+ tunnel destination <CSR-AWS-EIP>
  tunnel protection ipsec profile csr1
 !
 interface LISP0
