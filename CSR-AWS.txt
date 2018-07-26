@@ -33,7 +33,7 @@ interface Tunnel0
  ip tcp adjust-mss 1360
  tunnel source GigabitEthernet1
  tunnel mode ipsec ipv4
- tunnel destination 173.37.56.178
+ tunnel destination <ASR-DC-Public-IP>
  tunnel protection ipsec profile csr1
 !
 interface LISP0
